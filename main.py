@@ -72,7 +72,7 @@ def execute(input_file, column_groups, output_file, raw_counts, export_mapping):
     click.secho(f"✅ Created data file: {output_file}", fg="green")
 
     if export_mapping:
-        mapping_file = f"{Path(output_file)}_{get_current_datetime()}.json"
+        mapping_file = f"{Path(output_file)}.json"
         encoder.write_mapping(mapping_file)
         click.secho(f"✅ Created mapping file: {mapping_file}", fg="green")
 
