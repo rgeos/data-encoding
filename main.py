@@ -31,12 +31,12 @@ from ClassFrequencyEncoder import *
     show_default=True,
 )
 @click.option(
-    "-rc",
-    "--raw_counts",
+    "-nf",
+    "--normalized_frequencies",
     required=False,
     is_flag=True,
     default=False,
-    help="Store raw occurrence counts instead of normalized frequencies.",
+    help="Store normalized frequencies instead of raw occurrence counts.",
     show_default=True,
 )
 @click.option(
@@ -48,18 +48,18 @@ from ClassFrequencyEncoder import *
     help="Write the frequency-encoder mapping to a .mapping.json file.",
     show_default=True,
 )
-def execute(input_file, column_groups, output_file, raw_counts, export_mapping):
+def execute(input_file, column_groups, output_file, normalized_frequencies, export_mapping):
     """
     :param input_file:
     :param column_groups:
     :param output_file:
-    :param raw_counts:
+    :param normalized_frequencies:
     :param export_mapping:
     :return:
     """
     click.secho("Initializing...\n", fg="green")
 
-    config = FrequencyEncodingConfig(column_groups=column_groups, normalize=raw_counts)
+    config = FrequencyEncodingConfig(column_groups=column_groups, normalize=normalized_frequencies)
     encoder = FrequencyEncoder(config=config)
 
     pipeline = FrequencyEncodingPipeline(
