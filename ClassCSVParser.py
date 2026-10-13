@@ -7,7 +7,8 @@ import pandas as pd
 class CsvReader:
     """Reads CSV files into pandas DataFrames."""
 
-    def read(self, input_path: str | Path) -> pd.DataFrame:
+    @staticmethod
+    def read(input_path: str | Path) -> pd.DataFrame:
         input_path = Path(input_path)
 
         if not input_path.exists():
@@ -22,8 +23,8 @@ class CsvReader:
 class CsvWriter:
     """Writes pandas DataFrames to CSV files."""
 
+    @staticmethod
     def write(
-        self,
         dataframe: pd.DataFrame,
         output_path: str | Path,
     ) -> None:

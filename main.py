@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-from unittest import enterModuleContext
-
-import click
 
 from common import *
 from ClassFrequencyEncoder import *
@@ -38,7 +35,7 @@ from ClassFrequencyEncoder import *
     "--raw_counts",
     required=False,
     is_flag=True,
-    default=True,
+    default=False,
     help="Store raw occurrence counts instead of normalized frequencies.",
     show_default=True,
 )
@@ -51,18 +48,18 @@ from ClassFrequencyEncoder import *
     help="Write the frequency-encoder mapping to a .mapping.json file.",
     show_default=True,
 )
-def execute(input_file, groups, output_file, raw_counts, export_mapping):
+def execute(input_file, column_groups, output_file, raw_counts, export_mapping):
     """
-
     :param input_file:
-    :param groups:
+    :param column_groups:
     :param output_file:
     :param raw_counts:
+    :param export_mapping:
     :return:
     """
     click.secho("Initializing...\n", fg="green")
 
-    config = FrequencyEncodingConfig(column_groups=groups, normalize=raw_counts)
+    config = FrequencyEncodingConfig(column_groups=column_groups, normalize=raw_counts)
     encoder = FrequencyEncoder(config=config)
 
     pipeline = FrequencyEncodingPipeline(
@@ -75,7 +72,7 @@ def execute(input_file, groups, output_file, raw_counts, export_mapping):
     click.secho(f"✅ Created data file: {output_file}", fg="green")
 
     if export_mapping:
-        mapping_file = f"{Path(output_file)}_{get_current_datetime()}.json"
+        mapping_file = f"{Path(output_file)}.json"
         encoder.write_mapping(mapping_file)
         click.secho(f"✅ Created mapping file: {mapping_file}", fg="green")
 
