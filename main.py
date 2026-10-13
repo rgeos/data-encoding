@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-from unittest import enterModuleContext
-
-import click
 
 from common import *
 from ClassFrequencyEncoder import *
@@ -38,7 +35,7 @@ from ClassFrequencyEncoder import *
     "--raw_counts",
     required=False,
     is_flag=True,
-    default=True,
+    default=False,
     help="Store raw occurrence counts instead of normalized frequencies.",
     show_default=True,
 )
@@ -51,18 +48,18 @@ from ClassFrequencyEncoder import *
     help="Write the frequency-encoder mapping to a .mapping.json file.",
     show_default=True,
 )
-def execute(input_file, groups, output_file, raw_counts, export_mapping):
+def execute(input_file, column_groups, output_file, raw_counts, export_mapping):
     """
-
     :param input_file:
-    :param groups:
+    :param column_groups:
     :param output_file:
     :param raw_counts:
+    :param export_mapping:
     :return:
     """
     click.secho("Initializing...\n", fg="green")
 
-    config = FrequencyEncodingConfig(column_groups=groups, normalize=raw_counts)
+    config = FrequencyEncodingConfig(column_groups=column_groups, normalize=raw_counts)
     encoder = FrequencyEncoder(config=config)
 
     pipeline = FrequencyEncodingPipeline(

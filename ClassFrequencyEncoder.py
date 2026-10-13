@@ -26,7 +26,7 @@ class FrequencyEncodingConfig:
     """
 
     column_groups: Sequence[Sequence[str]]
-    normalize: bool = True
+    normalize: bool = False
 
     def validate(self) -> None:
         if not self.column_groups:
