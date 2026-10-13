@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
+from ClassCSVParser import CsvReader, CsvWriter
 from dataclasses import dataclass
 from collections import Counter
-from pathlib import Path
-from ClassCSVParser import CsvReader, CsvWriter
-import pandas as pd
 from typing import Sequence
+from pathlib import Path
+import pandas as pd
+import json
 
 
 @dataclass(frozen=True)
@@ -47,11 +48,13 @@ class FrequencyEncoder:
     def __init__(self, config: FrequencyEncodingConfig):
         self.config = config
         self.config.validate()
+        self._mappings = None
 
     def encode(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         """
         Return a copy of the DataFrame with frequency-encoded columns added.
         """
+        self._mappings = []
 
         encoded_dataframe = dataframe.copy()
 
@@ -98,6 +101,31 @@ class FrequencyEncoder:
 
         encoded_values = [frequencies[row_key] for row_key in row_keys]
 
+        # for mapping output
+        row_count = len(dataframe)
+        entries = []
+
+        for row_key, count in frequencies.items():
+            encoded_value = (
+                count / row_count if self.config.normalize and row_count else count
+            )
+            entries.append(
+                {
+                    "values": list(row_key),
+                    "count": count,
+                    "encoded_value": encoded_value,
+                }
+            )
+
+        self._mappings.append(
+            {
+                "columns": column_group,
+                "output_column": output_column,
+                "normalized": self.config.normalize,
+                "entries": entries,
+            }
+        )
+
         if self.config.normalize:
             row_count = len(dataframe)
 
@@ -117,11 +145,9 @@ class FrequencyEncoder:
         Convert every row into a hashable tuple.
 
         For one column:
-
-            ["USA"] -> ("USA",)
+            ["USA"] -> ("USA")
 
         For multiple columns:
-
             ["USA", "New York"] -> ("USA", "New York")
         """
 
@@ -144,6 +170,18 @@ class FrequencyEncoder:
         column_group: list[str],
     ) -> str:
         return "freq_" + "_".join(column_group)
+
+    def write_mapping(self, output_path: str | Path) -> None:
+        """Write the mappings produced by the most recent encode() call."""
+        if self._mappings is None:
+            raise RuntimeError("Call encode() before writing the frequency mapping.")
+
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with output_path.open("w", encoding="utf-8") as mapping_file:
+            json.dump(self._mappings, mapping_file, indent=2, default=str)
+            mapping_file.write("\n")
 
 
 class FrequencyEncodingPipeline:
