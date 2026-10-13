@@ -180,7 +180,7 @@ class FrequencyEncoder:
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         with output_path.open("w", encoding="utf-8") as mapping_file:
-            json.dump(self._mappings, mapping_file, indent=2, default=str)
+            json.dump(self._mappings, mapping_file, indent=2, default=str, ensure_ascii=False)
             mapping_file.write("\n")
 
 
