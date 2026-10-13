@@ -10,7 +10,7 @@ def get_current_datetime():
     return now.strftime("%Y-%m-%d_%H_%M_%S")
 
 
-class ColumnGrouping(click.ParamType[str]):
+class ColumnGroups(click.ParamType[str]):
     name = "column grouping"
 
     def convert(self, value: str, param, ctx) -> list[list[str]]:
@@ -45,4 +45,4 @@ class ColumnGrouping(click.ParamType[str]):
 
 
 # used as custom type for click
-COLUMN_GROUPING = ColumnGrouping()
+COLUMN_GROUPS = ColumnGroups()

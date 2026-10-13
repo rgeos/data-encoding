@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from unittest import enterModuleContext
+
+import click
 
 from common import *
 from ClassFrequencyEncoder import *
@@ -13,9 +16,9 @@ from ClassFrequencyEncoder import *
     help="Input CSV file.",
 )
 @click.option(
-    "-g",
-    "--groups",
-    type=COLUMN_GROUPING,
+    "-cg",
+    "--column_groups",
+    type=COLUMN_GROUPS,
     required=True,
     help=(
         "JSON list of column groups. Example: " '\'[["country"], ["country", "city"]]\''
@@ -31,7 +34,7 @@ from ClassFrequencyEncoder import *
     show_default=True,
 )
 @click.option(
-    "-r",
+    "-rc",
     "--raw_counts",
     required=False,
     is_flag=True,
@@ -39,7 +42,16 @@ from ClassFrequencyEncoder import *
     help="Store raw occurrence counts instead of normalized frequencies.",
     show_default=True,
 )
-def execute(input_file, groups, output_file, raw_counts):
+@click.option(
+    "-em",
+    "--export_mapping",
+    required=False,
+    is_flag=True,
+    default=False,
+    help="Write the frequency-encoder mapping to a .mapping.json file.",
+    show_default=True,
+)
+def execute(input_file, groups, output_file, raw_counts, export_mapping):
     """
 
     :param input_file:
@@ -48,18 +60,24 @@ def execute(input_file, groups, output_file, raw_counts):
     :param raw_counts:
     :return:
     """
-    click.secho("Initializing...", fg="green")
+    click.secho("Initializing...\n", fg="green")
 
     config = FrequencyEncodingConfig(column_groups=groups, normalize=raw_counts)
+    encoder = FrequencyEncoder(config=config)
 
     pipeline = FrequencyEncodingPipeline(
-        reader=CsvReader(), encoder=FrequencyEncoder(config=config), writer=CsvWriter()
+        reader=CsvReader(), encoder=encoder, writer=CsvWriter()
     )
 
     pipeline.run(input_path=input_file, output_path=output_file)
 
-    click.secho("\n✨ Execution Successful!", fg="green", bold=True)
-    click.secho(f"\n✅ Created: {output_file}", fg="green")
+    click.secho("✨ Execution Successful!", fg="green", bold=True)
+    click.secho(f"✅ Created data file: {output_file}", fg="green")
+
+    if export_mapping:
+        mapping_file = f"{Path(output_file)}_{get_current_datetime()}.json"
+        encoder.write_mapping(mapping_file)
+        click.secho(f"✅ Created mapping file: {mapping_file}", fg="green")
 
 
 if __name__ == "__main__":
