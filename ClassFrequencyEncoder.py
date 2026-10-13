@@ -169,7 +169,7 @@ class FrequencyEncoder:
     def _get_output_column_name(
         column_group: list[str],
     ) -> str:
-        return "freq_" + "_".join(column_group)
+        return "freq_" + "__".join(column_group)
 
     def write_mapping(self, output_path: str | Path) -> None:
         """Write the mappings produced by the most recent encode() call."""
